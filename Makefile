@@ -111,14 +111,14 @@ bbl: vmlinux
 	cp build/bbl bbl
 
 bbl_binary: bbl
-	riscv32-unknown-elf-objcopy -O binary bbl bbl_binary
+	riscv32-unknown-linux-gnu-objcopy -O binary bbl bbl_binary
 
 clean:
 	rm -rf vmlinux bbl riscv-pk/build/vmlinux riscv-pk/build/bbl cachetest/*.elf rootfs/tetris
 	make -C buildroot distclean
 
 bbl.bin: bbl
-	riscv32-unknown-elf-objcopy -S -O binary --change-addresses -0x80000000 $< $@
+	riscv32-unknown-linux-gnu-objcopy -S -O binary --change-addresses -0x80000000 $< $@
 
 clean-all: clean
 	rm -rf riscv-fesvr/build riscv-isa-sim/build riscv-gnu-toolchain/build riscv-tests/build riscv-pk/build
