@@ -4,7 +4,7 @@
 	branch = master
 [submodule "riscv-pk"]
 	path = riscv-pk
-	url = https://github.com/pulp-platform/riscv-pk.git
+	url = https://github.com/EyssK/riscv-pk
 	branch = master
 [submodule "riscv-isa-sim"]
 	path = riscv-isa-sim
@@ -23,4 +23,4 @@
 	url = git://git.buildroot.net/buildroot
 [submodule "vitetris"]
 	path = vitetris
-	url = https://github.com/pulp-platform/vitetris.git
+	url = https://github.com/EyssK/vitetris
