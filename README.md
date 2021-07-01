@@ -1,3 +1,7 @@
+This is a buildroot port for cv32a6. Buildroot has been bumped to the 2021.05-rc1 version to handle RV32 ISA. It uses the gcc9.3+glibc2.32 from the buildroot internal toolchain instead of the riscv-gnu-toolchain.
+Toolchain is installed in ./buildroot/output/host/bin.
+Made thanks to Sébastien Jacq, Kevin Eyssartier and Zbigniew Chamski.
+
 # Ariane SDK
 
 This repository houses a set of RISCV tools for the [ariane core](https://github.com/pulp-platform/ariane). It contains some small modifications to the official [riscv-tools](https://github.com/riscv/riscv-tools). Most importantly it **does not contain openOCD**.
