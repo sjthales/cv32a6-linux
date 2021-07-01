@@ -90,12 +90,12 @@ all: gnu-toolchain-libc fesvr isa-sim tests pk
 
 # benchmark for the cache subsystem
 cachetest:
-	cd ./cachetest/ && $(RISCV)/bin/riscv32-unknown-linux-gnu-gcc cachetest.c -o cachetest.elf
+	cd ./cachetest/ && $(ROOT)/buildroot/output/host/bin/riscv32-buildroot-linux-gnu-gcc cachetest.c -o cachetest.elf
 	cp ./cachetest/cachetest.elf rootfs/
 
 # cool command-line tetris
 rootfs/tetris:
-	cd ./vitetris/ && make clean && ./configure CC=riscv32-unknown-linux-gnu-gcc && make
+	cd ./vitetris/ && make clean && ./configure CC=$(ROOT)/buildroot/output/host/bin/riscv32-buildroot-linux-gnu-gcc && make
 	cp ./vitetris/tetris $@
 
 vmlinux: $(buildroot_defconfig) $(linux_defconfig) $(busybox_defconfig) $(RISCV)/bin/riscv32-unknown-elf-gcc $(RISCV)/bin/riscv32-unknown-linux-gnu-gcc cachetest rootfs/tetris
