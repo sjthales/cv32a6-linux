@@ -86,7 +86,11 @@ pk: install-dir $(RISCV)/bin/riscv32-unknown-linux-gnu-gcc
 	make install;\
 	cd $(ROOT)
 
-all: gnu-toolchain-libc fesvr isa-sim tests pk
+all: $(ROOT)/buildroot/output/host/bin/riscv32-buildroot-linux-gnu-gcc
+
+$(ROOT)/buildroot/output/host/bin/riscv32-buildroot-linux-gnu-gcc: $(buildroot_defconfig) $(linux_defconfig) $(busybox_defconfig)
+	make -C buildroot defconfig BR2_DEFCONFIG=../$(buildroot_defconfig)
+	make -C buildroot host-gcc-final
 
 # benchmark for the cache subsystem
 cachetest:
@@ -98,9 +102,8 @@ rootfs/tetris:
 	cd ./vitetris/ && make clean && ./configure CC=$(ROOT)/buildroot/output/host/bin/riscv32-buildroot-linux-gnu-gcc && make
 	cp ./vitetris/tetris $@
 
-vmlinux: $(buildroot_defconfig) $(linux_defconfig) $(busybox_defconfig) $(RISCV)/bin/riscv32-unknown-elf-gcc $(RISCV)/bin/riscv32-unknown-linux-gnu-gcc cachetest rootfs/tetris
+vmlinux: $(ROOT)/buildroot/output/host/bin/riscv32-buildroot-linux-gnu-gcc cachetest rootfs/tetris
 	mkdir -p build
-	make -C buildroot defconfig BR2_DEFCONFIG=../$(buildroot_defconfig)
 	make -C buildroot
 	cp buildroot/output/images/vmlinux build/vmlinux
 	cp build/vmlinux vmlinux
@@ -111,14 +114,14 @@ bbl: vmlinux
 	cp build/bbl bbl
 
 bbl_binary: bbl
-	riscv32-unknown-linux-gnu-objcopy -O binary bbl bbl_binary
+	$(ROOT)/buildroot/output/host/bin/riscv32-buildroot-linux-gnu-objcopy -O binary bbl bbl_binary
 
 clean:
 	rm -rf vmlinux bbl riscv-pk/build/vmlinux riscv-pk/build/bbl cachetest/*.elf rootfs/tetris
 	make -C buildroot distclean
 
 bbl.bin: bbl
-	riscv32-unknown-linux-gnu-objcopy -S -O binary --change-addresses -0x80000000 $< $@
+	$(ROOT)/buildroot/output/host/bin/riscv32-buildroot-linux-gnu-objcopy -S -O binary --change-addresses -0x80000000 $< $@
 
 clean-all: clean
 	rm -rf riscv-fesvr/build riscv-isa-sim/build riscv-gnu-toolchain/build riscv-tests/build riscv-pk/build
