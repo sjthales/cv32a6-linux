@@ -21,18 +21,15 @@ tests-co              = --prefix=$(RISCV)/target
 # specific flags and rules for 32 / 64 version
 ifeq ($(XLEN), 32)
 isa-sim-co            = --prefix=$(RISCV) --enable-commitlog --with-isa=RV32IMA --with-priv=MSU 
-gnu-toolchain-co-fast = --prefix=$(RISCV) --with-arch=rv32ima --with-abi=ilp32 --with-cmodel=medany --disable-gdb# no multilib for fast
 pk-co                 = --prefix=$(RISCV) --host=riscv$(XLEN)-buildroot-linux-gnu CC=$(CC) OBJDUMP=$(OBJDUMP) OBJCOPY=$(OBJCOPY) --enable-32bit
 else
 isa-sim-co            = --prefix=$(RISCV) --enable-commitlog --with-fesvr=$(DEST)
-gnu-toolchain-co-fast = --prefix=$(RISCV) --disable-gdb# no multilib for fast
 pk-co                 = --prefix=$(RISCV) --host=riscv$(XLEN)-buildroot-linux-gnu CC=$(CC) OBJDUMP=$(OBJDUMP) OBJCOPY=$(OBJCOPY)
 endif
 
 # default make flags
 fesvr-mk                = -j$(NR_CORES)
 isa-sim-mk              = -j$(NR_CORES)
-gnu-toolchain-libc-mk   = linux -j$(NR_CORES)
 pk-mk 					= -j$(NR_CORES)
 tests-mk         		= -j$(NR_CORES)
 
@@ -43,25 +40,6 @@ busybox_defconfig = configs/busybox$(XLEN).config
 
 install-dir:
 	mkdir -p $(RISCV)
-
-$(RISCV)/bin/riscv$(XLEN)-unknown-elf-gcc: gnu-toolchain-newlib
-	cd riscv-gnu-toolchain/build;\
-	make -j$(NR_CORES);\
-	cd $(ROOT)
-
-gnu-toolchain-newlib: install-dir
-	mkdir -p riscv-gnu-toolchain/build
-	cd riscv-gnu-toolchain/build;\
-	../configure --prefix=$(RISCV);\
-	cd $(ROOT)
-
-gnu-toolchain-libc: $(CC)
-
-gnu-toolchain-no-multilib: install-dir
-	mkdir -p riscv-gnu-toolchain/build
-	cd riscv-gnu-toolchain/build;\
-	../configure $(gnu-toolchain-co-fast);\
-	cd $(ROOT)
 
 fesvr: install-dir $(CC)
 	mkdir -p riscv-fesvr/build
@@ -120,6 +98,9 @@ vmlinux: $(CC) cachetest rootfs/tetris
 
 bbl: vmlinux
 	cd build && ../riscv-pk/configure --host=riscv$(XLEN)-buildroot-linux-gnu READELF=$(READELF) OBJCOPY=$(OBJCOPY) CC=$(CC) OBJDUMP=$(OBJDUMP) --with-payload=vmlinux --enable-logo --with-logo=../configs/logo.txt
+	echo "CFLAGS=-fno-stack-protector" > _tmp.mk
+	cat build/Makefile >> _tmp.mk
+	mv _tmp.mk build/Makefile
 	make -C build
 	cp build/bbl $@
 
@@ -127,7 +108,7 @@ bbl_binary: bbl
 	$(OBJCOPY) -O binary $< $@
 
 clean:
-	rm -rf $(RISCV)/bbl.bin $(RISCV)/bbl_binary $(RISCV)/bbl vmlinux bbl riscv-pk/build/vmlinux riscv-pk/build/bbl cachetest/*.elf rootfs/tetris
+	rm -rf $(RISCV)/bbl.bin $(RISCV)/bbl_binary $(RISCV)/bbl vmlinux bbl build riscv-pk/build/vmlinux riscv-pk/build/bbl cachetest/*.elf rootfs/tetris
 	make -C buildroot clean
 
 bbl.bin: bbl
@@ -142,10 +123,10 @@ $(RISCV)/bbl.bin: bbl.bin
 $(RISCV)/bbl_binary: bbl_binary
 	cp $< $@
 
-images: $(RISCV)/bbl $(RISCV)/bbl.bin $(RISCV)/bbl_binary
+images: all $(RISCV)/bbl $(RISCV)/bbl.bin $(RISCV)/bbl_binary
 
 clean-all: clean
-	rm -rf $(RISCV) riscv-fesvr/build riscv-isa-sim/build riscv-gnu-toolchain/build riscv-tests/build riscv-pk/build
+	rm -rf $(RISCV) riscv-fesvr/build riscv-isa-sim/build riscv-tests/build riscv-pk/build
 
 .PHONY: cachetest rootfs/tetris
 
@@ -154,7 +135,7 @@ help:
 	@echo ""
 	@echo "install [tool] to \$$RISCV with compiler <flag>'s"
 	@echo "    where tool can be any one of:"
-	@echo "        fesvr isa-sim gnu-toolchain tests pk"
+	@echo "        fesvr isa-sim tests pk"
 	@echo ""
 	@echo "build linux images for ariane"
 	@echo "    build vmlinux with"
@@ -163,9 +144,9 @@ help:
 	@echo "        make bbl"
 	@echo ""
 	@echo "There are two clean targets:"
-	@echo "    Clean only buildroot"
+	@echo "    Clean only build object"
 	@echo "        make clean"
-	@echo "    Clean everything (including toolchain etc)"
+	@echo "    Clean everything (including tools etc)"
 	@echo "        make clean-all"
 	@echo ""
 	@echo "defaults:"
