@@ -1,6 +1,6 @@
 # Makefile for RISC-V toolchain; run 'make help' for usage.
 
-XLEN     := 64
+XLEN     := 32
 ROOT     := $(patsubst %/,%, $(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
 RISCV    := $(PWD)/install$(XLEN)
 DEST     := $(abspath $(RISCV))
@@ -97,10 +97,7 @@ vmlinux: $(CC) cachetest rootfs/tetris
 	cp build/vmlinux $@
 
 bbl: vmlinux
-	cd build && ../riscv-pk/configure --host=riscv$(XLEN)-buildroot-linux-gnu READELF=$(READELF) OBJCOPY=$(OBJCOPY) CC=$(CC) OBJDUMP=$(OBJDUMP) --with-payload=vmlinux --enable-logo --with-logo=../configs/logo.txt
-	echo "CFLAGS=-fno-stack-protector" > _tmp.mk
-	cat build/Makefile >> _tmp.mk
-	mv _tmp.mk build/Makefile
+	cd build && ../riscv-pk/configure --host=riscv$(XLEN)-buildroot-linux-gnu READELF=$(READELF) OBJCOPY=$(OBJCOPY) CC=$(CC) OBJDUMP=$(OBJDUMP) --with-payload=vmlinux --enable-logo --with-logo=../configs/logo.txt CFLAGS=-fno-stack-protector
 	make -C build
 	cp build/bbl $@
 
