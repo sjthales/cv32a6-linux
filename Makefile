@@ -2,7 +2,7 @@
 
 XLEN     := 64
 ROOT     := $(patsubst %/,%, $(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
-RISCV    ?= $(PWD)/install$(XLEN)
+RISCV    := $(PWD)/install$(XLEN)
 DEST     := $(abspath $(RISCV))
 PATH     := $(DEST)/bin:$(PATH)
 
@@ -108,7 +108,7 @@ bbl_binary: bbl
 	$(OBJCOPY) -O binary $< $@
 
 clean:
-	rm -rf $(RISCV)/bbl.bin $(RISCV)/bbl_binary $(RISCV)/bbl vmlinux bbl build riscv-pk/build/vmlinux riscv-pk/build/bbl cachetest/*.elf rootfs/tetris
+	rm -rf vmlinux bbl build riscv-pk/build/vmlinux riscv-pk/build/bbl cachetest/*.elf rootfs/tetris
 	make -C buildroot clean
 
 bbl.bin: bbl
