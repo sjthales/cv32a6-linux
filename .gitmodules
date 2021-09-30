@@ -19,4 +19,4 @@
 	url = git://git.buildroot.net/buildroot
 [submodule "vitetris"]
 	path = vitetris
-	url = https://github.com/EyssK/vitetris
+	url = https://github.com/pulp-platform/vitetris
