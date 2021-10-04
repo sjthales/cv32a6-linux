@@ -20,10 +20,10 @@ tests-co              = --prefix=$(RISCV)/target
 
 # specific flags and rules for 32 / 64 version
 ifeq ($(XLEN), 32)
-isa-sim-co            = --prefix=$(RISCV) --enable-commitlog --with-isa=RV32IMA --with-priv=MSU 
+isa-sim-co            = --prefix=$(RISCV) --with-isa=RV32IMA --with-priv=MSU
 pk-co                 = --prefix=$(RISCV) --host=riscv$(XLEN)-buildroot-linux-gnu CC=$(CC) OBJDUMP=$(OBJDUMP) OBJCOPY=$(OBJCOPY) --enable-32bit
 else
-isa-sim-co            = --prefix=$(RISCV) --enable-commitlog --with-fesvr=$(DEST)
+isa-sim-co            = --prefix=$(RISCV) --with-fesvr=$(DEST)
 pk-co                 = --prefix=$(RISCV) --host=riscv$(XLEN)-buildroot-linux-gnu CC=$(CC) OBJDUMP=$(OBJDUMP) OBJCOPY=$(OBJCOPY)
 endif
 
